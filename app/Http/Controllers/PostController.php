@@ -8,18 +8,22 @@ use App\Http\Requests\UpdatePostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Http\RedirectResponse;
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Post::class);
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index(): Renderable
+    public function index(): mixed
     {
         $posts = Post::orderBy('created_at', 'desc')->paginate();
 
-        return respond_to(fn($format) => match ($format) {
+        return respond_to(fn ($format) => match ($format) {
             'json' => PostResource::collection($posts),
             'html' => view('posts.index', [
                 'posts' => $posts,
@@ -40,7 +44,7 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePostRequest $request): RedirectResponse
+    public function store(StorePostRequest $request): mixed
     {
         $data = $request->validated();
 
@@ -50,7 +54,7 @@ class PostController extends Controller
 
         $post = auth()->user()->posts()->create($data);
 
-        return respond_to(fn($format) => match ($format) {
+        return respond_to(fn ($format) => match ($format) {
             'json' => PostResource::make($post),
             'html' => to_route('posts.show', $post),
         });
@@ -59,9 +63,9 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Post $post): Renderable
+    public function show(Post $post): mixed
     {
-        return respond_to(fn($format) => match ($format) {
+        return respond_to(fn ($format) => match ($format) {
             'json' => PostResource::make($post),
             'html' => view('posts.show', [
                 'post' => $post,
@@ -72,7 +76,7 @@ class PostController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Post $post): Renderable
+    public function edit(Post $post): mixed
     {
         return view('posts.edit', [
             'statuses' => Status::cases(),
@@ -83,7 +87,7 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdatePostRequest $request, Post $post): RedirectResponse
+    public function update(UpdatePostRequest $request, Post $post): mixed
     {
         $post->fill($request->safe()->except('image'));
 
@@ -93,7 +97,7 @@ class PostController extends Controller
 
         $post->save();
 
-        return respond_to(fn($format) => match ($format) {
+        return respond_to(fn ($format) => match ($format) {
             'json' => PostResource::make($post->fresh()),
             'html' => to_route('posts.show', $post),
         });
@@ -102,11 +106,11 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post): RedirectResponse
+    public function destroy(Post $post): mixed
     {
         $post->delete();
 
-        return respond_to(fn($format) => match ($format) {
+        return respond_to(fn ($format) => match ($format) {
             'json' => response()->noContent(),
             'html' => to_route('posts.index'),
         });

@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
+use Closure;
 use Illuminate\Routing\ResponseFactory;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Closure;
 
 class AppServiceProvider extends ServiceProvider
 {
