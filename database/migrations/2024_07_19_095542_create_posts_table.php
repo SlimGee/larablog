@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('status');
             $table->longText('content');
             $table->foreignIdFor(User::class);
-            $table->text('meta')->nullable();
+            $table->text('image')->nullable();
             $table->timestamps();
         });
     }

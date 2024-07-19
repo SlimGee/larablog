@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\Post\Status;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\RedirectResponse;
@@ -18,9 +19,12 @@ class PostController extends Controller
     {
         $posts = Post::orderBy('created_at', 'desc')->paginate();
 
-        return view('posts.index', [
-            'posts' => $posts,
-        ]);
+        return respond_to(fn($format) => match ($format) {
+            'json' => PostResource::collection($posts),
+            'html' => view('posts.index', [
+                'posts' => $posts,
+            ]),
+        });
     }
 
     /**
@@ -40,13 +44,16 @@ class PostController extends Controller
     {
         $data = $request->validated();
 
-        $request->whenFilled('image', function ($image) use ($data) {
-            $data['image'] = $image->store('public');
-        });
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('public');
+        }
 
         $post = auth()->user()->posts()->create($data);
 
-        return to_route('posts.show', $post);
+        return respond_to(fn($format) => match ($format) {
+            'json' => PostResource::make($post),
+            'html' => to_route('posts.show', $post),
+        });
     }
 
     /**
@@ -54,7 +61,12 @@ class PostController extends Controller
      */
     public function show(Post $post): Renderable
     {
-        return view('posts.show', $post);
+        return respond_to(fn($format) => match ($format) {
+            'json' => PostResource::make($post),
+            'html' => view('posts.show', [
+                'post' => $post,
+            ])
+        });
     }
 
     /**
@@ -75,13 +87,16 @@ class PostController extends Controller
     {
         $post->fill($request->safe()->except('image'));
 
-        $request->whenFilled('image', function ($image) use ($post) {
-            $post->image = $image->store('public');
-        });
+        if ($request->hasFile('image')) {
+            $post->image = $request->file('image')->store('public');
+        }
 
         $post->save();
 
-        return to_route('posts.show', $post);
+        return respond_to(fn($format) => match ($format) {
+            'json' => PostResource::make($post->fresh()),
+            'html' => to_route('posts.show', $post),
+        });
     }
 
     /**
@@ -91,6 +106,9 @@ class PostController extends Controller
     {
         $post->delete();
 
-        return to_route('posts.index');
+        return respond_to(fn($format) => match ($format) {
+            'json' => response()->noContent(),
+            'html' => to_route('posts.index'),
+        });
     }
 }
