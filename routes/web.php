@@ -5,7 +5,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return to_route('dashboard');
 });
 
 Route::get('/dashboard', function () {
@@ -20,4 +20,4 @@ Route::middleware('auth')->group(function () {
     Route::resource('posts', PostController::class);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
