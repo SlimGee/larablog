@@ -50,4 +50,10 @@ php artisan serve
 ## PS
 Everything in this app is behind authentication, so you'll need to register and login to access the blog posts. 
 
+## Test
+To run tests, run the following command:
+```bash
+php artisan test
+```
+
 

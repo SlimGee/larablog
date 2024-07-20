@@ -23,7 +23,7 @@ class PostController extends Controller
     {
         $posts = Post::orderBy('created_at', 'desc')->paginate();
 
-        return respond_to(fn ($format) => match ($format) {
+        return respond_to(fn($format) => match ($format) {
             'json' => PostResource::collection($posts),
             'html' => view('posts.index', [
                 'posts' => $posts,
@@ -54,7 +54,7 @@ class PostController extends Controller
 
         $post = auth()->user()->posts()->create($data);
 
-        return respond_to(fn ($format) => match ($format) {
+        return respond_to(fn($format) => match ($format) {
             'json' => PostResource::make($post),
             'html' => to_route('posts.show', $post),
         });
@@ -65,7 +65,7 @@ class PostController extends Controller
      */
     public function show(Post $post): mixed
     {
-        return respond_to(fn ($format) => match ($format) {
+        return respond_to(fn($format) => match ($format) {
             'json' => PostResource::make($post),
             'html' => view('posts.show', [
                 'post' => $post,
@@ -97,7 +97,7 @@ class PostController extends Controller
 
         $post->save();
 
-        return respond_to(fn ($format) => match ($format) {
+        return respond_to(fn($format) => match ($format) {
             'json' => PostResource::make($post->fresh()),
             'html' => to_route('posts.show', $post),
         });
@@ -110,7 +110,7 @@ class PostController extends Controller
     {
         $post->delete();
 
-        return respond_to(fn ($format) => match ($format) {
+        return respond_to(fn($format) => match ($format) {
             'json' => response()->noContent(),
             'html' => to_route('posts.index'),
         });
